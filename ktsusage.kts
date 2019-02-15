@@ -3,6 +3,7 @@
 
 // NOTE: This script does not run from Intellij IDEA due to open bug
 // https://youtrack.jetbrains.com/issue/KT-11618
+// Install https://github.com/holgerbrandl/kscript and run this script from command line
 
 package tech.dnene.ktsconfig
 
