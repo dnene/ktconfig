@@ -10,8 +10,11 @@ package tech.dnene.ktsconfig
 import java.io.File
 import java.nio.file.Path
 import arrow.core.Either
+import arrow.core.Option
 import arrow.core.left
 import arrow.core.right
+import arrow.core.some
+import arrow.core.None
 import arrow.instances.either.monad.binding
 
 // I could've loaded the following by compiling tech.dnene.ktconfig jar and publishing to maven repo
@@ -23,7 +26,7 @@ data class Config(
 
 data class ServerConfig(
     val host: String,
-    val port: Int)
+    val port: Option<Int>)
 
 data class PathConfig(
     val tmpDirPath : Path
@@ -61,9 +64,7 @@ class ServerConfigBuilder: Builder<ServerConfig> {
     var port: Int? = null
     override fun build(): Either<String, ServerConfig> =
         host?.let { host ->
-            port?.let { port ->
-                ServerConfig(host, port).right()
-            } ?: "port must be specified".left()
+            ServerConfig(host, port?.let{ it.some() } ?: None).right()
         } ?: "host must be specified".left()
 }
 
@@ -95,3 +96,9 @@ result.fold(
     { println("Could not build config. Error: ${it}")},
     { println("Config loaded successfully. ${it}")}
 )
+
+// alternative way to use type safe construction but skip the dsl and validations in the dsl
+
+val noDslServerConfig = ServerConfig("localhost", 8080.some())
+val noDslPathConfig = PathConfig(File("/tmp").toPath())
+val noDslConfig = Config(noDslServerConfig, noDslPathConfig)
